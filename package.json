@@ -1,14 +1,12 @@
 {
   "name": "language-vsitemplate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Language support for VSI Template",
-  "keywords": [
-  ],
+  "keywords": [],
   "repository": "https://github.com/systemviewinc/language-vsitemplate",
   "license": "MIT",
   "engines": {
     "atom": "*"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
