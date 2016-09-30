@@ -1,0 +1,53 @@
+'scopeName': 'text.vsitemplate'
+'name': 'VSI Template'
+'fileTypes': [
+  'templ'
+  'partial'
+]
+'patterns': [
+  {
+    'include': '#block-expression-start'
+  }
+  {
+    'include': '#block-expression-end'
+  }
+  {
+    'include': '#template'
+  }
+]
+'repository':
+  'block-expression-start':
+    'begin': '\\{\\{([#^]|[!^]\\s*)([\\w\\.]*)'
+    'beginCaptures':
+      '0':
+        'name': 'entity.name.tag.vsitemplate'
+      '1':
+        'name': 'punctuation.definition.block.begin.vsitemplate'
+      '2':
+        'name': 'entity.name.function.vsitemplate'
+    'end': '\\s*\\}\\}'
+    'endCaptures':
+      '0':
+        'name': 'entity.name.tag.vsitemplate'
+    'name': 'meta.tag.template.vsitemplate'
+  'block-expression-end':
+    'begin': '\\{\\{([/]\\s*)([\\w\\.]*)'
+    'beginCaptures':
+      '0':
+        'name': 'entity.name.tag.vsitemplate'
+      '1':
+        'name': 'punctuation.definition.block.end.vsitemplate'
+      '2':
+        'name': 'entity.name.function.vsitemplate'
+    'end': '\\s*\\}\\}'
+    'endCaptures':
+      '0':
+        'name': 'entity.name.tag.vsitemplate'
+    'name': 'meta.tag.template.vsitemplate'
+  'template':
+    'begin': '\\{\\{[<>]?'
+    'end': '\\}\\}'
+    'captures':
+      '0':
+        'name': 'entity.name.tag.vsitemplate'
+    'name': 'meta.tag.template.vsitemplate'
