@@ -17,7 +17,7 @@
 ]
 'repository':
   'block-expression-start':
-    'begin': '\\{\\{([#!]\\s*)([\\w\\.]*)'
+    'begin': '\\{\\{([#!~]\\s*)([\\w\\.]*)'
     'beginCaptures':
       '0':
         'name': 'entity.name.tag.vsitemplate'
