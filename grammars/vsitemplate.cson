@@ -14,6 +14,34 @@
   {
     'include': '#template'
   }
+  {
+    'begin': '({{)(#|~|\?)([-_a-zA-Z0-9\.]+)(}})'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.tag.vsitemplate'
+      '2':
+        'name': 'punctuation.definition.block.begin.vsitemplate'
+      '3':
+        'name': 'entity.name.tag.vsitemplate'
+      '4':
+        'name': 'entity.name.tag.localname.vsitemplate'
+    'end': '({{)(/)([-_a-zA-Z0-9\.]+)(}})'
+    'endCaptures':
+      '1':
+        'name': 'punctuation.definition.tag.vsitemplate'
+      '2':
+        'name': 'punctuation.definition.block.end.vsitemplate'
+      '3':
+        'name': 'entity.name.tag.vsitemplate'
+      '4':
+        'name': 'entity.name.tag.localname.vsitemplate'
+    'name': 'meta.tag.content.vsitemplate'
+    'patterns': [
+      {
+        'include': '#tagStuff'
+      }
+    ]
+  }
 ]
 'repository':
   'block-expression-start':
