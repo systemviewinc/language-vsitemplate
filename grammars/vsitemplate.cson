@@ -6,76 +6,114 @@
 ]
 'patterns': [
   {
-    'include': '#block-expression-start'
-  }
-  {
-    'include': '#block-expression-end'
-  }
-  {
-    'include': '#template'
-  }
-  {
-    'begin': '({{)(#|~|\?)([-_a-zA-Z0-9\.]+)(}})'
+    'begin': '({{)([#!~?])([-_a-zA-Z0-9.]+)(}})'
     'beginCaptures':
       '1':
         'name': 'punctuation.definition.tag.vsitemplate'
       '2':
-        'name': 'punctuation.definition.block.begin.vsitemplate'
+        'name': 'punctuation.definition.tag.vsitemplate'
       '3':
         'name': 'entity.name.tag.vsitemplate'
       '4':
-        'name': 'entity.name.tag.localname.vsitemplate'
-    'end': '({{)(/)([-_a-zA-Z0-9\.]+)(}})'
+        'name': 'punctuation.definition.tag.vsitemplate'
+    'end': '({{)(\/)([-_a-zA-Z0-9.]+)(}})'
     'endCaptures':
       '1':
         'name': 'punctuation.definition.tag.vsitemplate'
       '2':
-        'name': 'punctuation.definition.block.end.vsitemplate'
+        'name': 'punctuation.definition.tag.vsitemplate'
       '3':
         'name': 'entity.name.tag.vsitemplate'
       '4':
-        'name': 'entity.name.tag.localname.vsitemplate'
-    'name': 'meta.tag.content.vsitemplate'
+        'name': 'punctuation.definition.tag.vsitemplate'
+    'name': 'meta.tag.no-content.vsitemplate'
     'patterns': [
       {
         'include': '#tagStuff'
       }
     ]
   }
+  {
+    'include': '#entity'
+  }
 ]
 'repository':
-  'block-expression-start':
-    'begin': '\\{\\{([#!~?]\\s*)([\\w\\.]*)'
+  'doublequotedString':
+    'begin': '"'
     'beginCaptures':
       '0':
-        'name': 'entity.name.tag.vsitemplate'
-      '1':
-        'name': 'punctuation.definition.block.begin.vsitemplate'
-      '2':
-        'name': 'entity.name.function.vsitemplate'
-    'end': '\\s*\\}\\}'
+        'name': 'punctuation.definition.string.begin.vsitemplate'
+    'end': '"'
     'endCaptures':
       '0':
-        'name': 'entity.name.tag.vsitemplate'
-    'name': 'meta.tag.template.vsitemplate'
-  'block-expression-end':
-    'begin': '\\{\\{([/]\\s*)([\\w\\.]*)'
-    'beginCaptures':
-      '0':
-        'name': 'entity.name.tag.vsitemplate'
-      '1':
-        'name': 'punctuation.definition.block.end.vsitemplate'
-      '2':
-        'name': 'entity.name.function.vsitemplate'
-    'end': '\\s*\\}\\}'
-    'endCaptures':
-      '0':
-        'name': 'entity.name.tag.vsitemplate'
-    'name': 'meta.tag.template.vsitemplate'
-  'template':
-    'begin': '\\{\\{[<>]?'
-    'end': '\\}\\}'
+        'name': 'punctuation.definition.string.end.vsitemplate'
+    'name': 'string.quoted.double.vsitemplate'
+    'patterns': [
+      {
+        'include': '#entity'
+      }
+    ]
+  'entity':
     'captures':
+      '1':
+        'name': 'punctuation.definition.constant.vsitemplate'
+      '3':
+        'name': 'punctuation.definition.constant.vsitemplate'
+    'match': '(&)([:a-zA-Z_][:a-zA-Z0-9_.-]*|#[0-9]+|#x[0-9a-fA-F]+)(;)'
+    'name': 'constant.character.entity.vsitemplate'
+  'internalSubset':
+    'begin': '(\\[)'
+    'captures':
+      '1':
+        'name': 'punctuation.definition.constant.vsitemplate'
+    'end': '(\\])'
+    'name': 'meta.internalsubset.vsitemplate'
+    'patterns': [
+      {
+        'include': '#parameterEntity'
+      }
+    ]
+  'parameterEntity':
+    'captures':
+      '1':
+        'name': 'punctuation.definition.constant.vsitemplate'
+      '3':
+        'name': 'punctuation.definition.constant.vsitemplate'
+    'match': '(%)([:a-zA-Z_][:a-zA-Z0-9_.-]*)(;)'
+    'name': 'constant.character.parameter-entity.vsitemplate'
+  'singlequotedString':
+    'begin': '\''
+    'beginCaptures':
       '0':
-        'name': 'entity.name.tag.vsitemplate'
-    'name': 'meta.tag.template.vsitemplate'
+        'name': 'punctuation.definition.string.begin.vsitemplate'
+    'end': '\''
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.vsitemplate'
+    'name': 'string.quoted.single.vsitemplate'
+    'patterns': [
+      {
+        'include': '#entity'
+      }
+    ]
+  'tagStuff':
+    'patterns': [
+      {
+        'captures':
+          '1':
+            'name': 'entity.other.attribute-name.namespace.vsitemplate'
+          '2':
+            'name': 'entity.other.attribute-name.vsitemplate'
+          '3':
+            'name': 'punctuation.separator.namespace.vsitemplate'
+          '4':
+            'name': 'entity.other.attribute-name.localname.vsitemplate'
+        'match': '(?:^|\\s+)(?:([-\\w.]+)((:)))?([-\\w.:]+)='
+      }
+      {
+        'include': '#doublequotedString'
+      }
+      {
+        'include': '#singlequotedString'
+      }
+    ]
