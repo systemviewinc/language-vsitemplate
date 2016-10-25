@@ -5,8 +5,12 @@
   "keywords": [],
   "repository": "https://github.com/systemviewinc/language-vsitemplate",
   "license": "MIT",
+  "main": "lib/main",
   "engines": {
     "atom": "*"
   },
-  "dependencies": {}
+  "dependencies": {
+    "first-mate": "^6.2.0",
+    "underscore-plus": "^1.6.6"
+  }
 }

@@ -6,33 +6,89 @@
 ]
 'patterns': [
   {
-    'begin': '({{)([-\\.\\*\\w]+)'
-    'captures':
+    'begin': '(\\{\\{)([\\?\\!/~#])(\\.*)([-\\w\\.]*)(@?)'
+    'beginCaptures':
       '1':
-        'name': 'punctuation.definition.tag.vsitemplate'
+        'name': 'variable.parameter.function.vsitemplate'
       '2':
-        'name': 'entity.name.tag.vsitemplate'
-    'end': '(}})'
-    'name': 'meta.tag.preprocessor.vsitemplate'
+        'name': 'keyword.control.vsitemplate'
+      '3':
+        'name': 'entity.name.type.instance.vsitemplate'
+      '4':
+        'name': 'entity.name.function.vsitemplate'
+      '5':
+        'name': 'constant.character.escape.vsitemplate'
+    'end': '(\\}\\})'
+    'endCaptures':
+      '1':
+        'name': 'variable.parameter.function.vsitemplate'
+    'name': 'block.vsitemplate'
     'patterns': [
       {
-        'match': ' ([-\\.\\w]+)'
-        'name': 'entity.other.attribute-name.vsitemplate'
+        'include': '#tagStuff'
       }
     ]
   }
   {
-    'begin': '({{)([\\!\\?#~])((?:[-\\.\\w]+)?)}}(?=([\\s\\S]*)?{{/\\3)'
+    'begin': '(\\{\\{)(\\*?)(\\.*)([-\\w\\.]*)(@?)'
     'beginCaptures':
       '1':
-        'name': 'punctuation.definition.tag.vsitemplate'
+        'name': 'variable.parameter.function.vsitemplate'
       '2':
-        'name': 'keyword.other.entitytype.vsitemplate'
+        'name': 'keyword.operator.vsitemplate'
       '3':
-        'name': 'entity.name.tag.vsitemplate'
+        'name': 'entity.name.type.instance.vsitemplate'
       '4':
-        'name': 'content.vsitemplate'
-    'end': '(}})'
+        'name': 'punctuation.definition.string.vsitemplate'
+      '5':
+        'name': 'constant.character.escape.vsitemplate'
+    'end': '(\\}\\})'
+    'endCaptures':
+      '1':
+        'name': 'variable.parameter.function.vsitemplate'
     'name': 'meta.tag.vsitemplate'
+    'patterns': [
+      {
+        'include': '#tagStuff'
+      }
+    ]
   }
 ]
+'repository':
+  'tagStuff':
+    'patterns': [
+      {
+        'match': '(?:\\s*?)(?:([-\\w\\.]+))?([-\\w\\.]+)='
+        'captures':
+          '1':
+            'name': 'entity.other.attribute-name.namespace.vsitemplate'
+          '2':
+            'name': 'entity.other.attribute-name.vsitemplate'
+      }
+      {
+        'include': '#doublequotedString'
+      }
+      {
+        'include': '#singlequotedString'
+      }
+    ]
+  'doublequotedString':
+    'begin': '"'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.string.begin.vsitemplate'
+    'end': '"'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.vsitemplate'
+    'name': 'string.quoted.double.vsitemplate'
+  'singlequotedString':
+    'begin': '\''
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.string.begin.vsitemplate'
+    'end': '\''
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.string.end.vsitemplate'
+    'name': 'string.quoted.single.vsitemplate'
