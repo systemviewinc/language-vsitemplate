@@ -8,7 +8,7 @@ module.exports =
 class TagFinder
   constructor: (@editor) ->
     @tagPattern = /(\{\{)([\?\!/~#]?)(\.*)([-\w\.]*)(@?)/
-    @wordRegex = /[-\w\.]*/
+    @wordRegex = /[^\}\r\n]*/
     @tagSelector = SelectorCache.get('block.vsitemplate')
 
   patternForTagName: (tagName) ->
@@ -32,7 +32,7 @@ class TagFinder
       if match[1]
         unpairedCount--
         if unpairedCount < 0
-          startRange = range.translate([0, 3], [0, -match[2].length]) # Subtract < and tag name suffix from range
+          startRange = range.translate([0, 3], [0, -match[2].length]) # Subtract {{ and block operator from range
           stop()
       else
         unpairedCount++
@@ -51,7 +51,7 @@ class TagFinder
       else
         unpairedCount--
         if unpairedCount < 0
-          endRange = range.translate([0, 3], [0, -2]) # Subtract </ and > from range
+          endRange = range.translate([0, 3], [0, -2]) # Subtract {{/ and }} from range
           stop()
 
     endRange
