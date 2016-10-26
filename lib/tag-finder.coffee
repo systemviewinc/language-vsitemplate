@@ -71,9 +71,9 @@ class TagFinder
         startRange = Range.fromObject([range.start.translate([0, prefix.length + operator.length]), [range.start.row, Infinity]])
 
       if operator == '/'
-        endRange = @findStartTag(tagName, startRange.start)
+        endRange = @findStartTag(tag, startRange.start)
       else
-        endRange = @findEndTag(tagName, startRange.end)
+        endRange = @findEndTag(tag, startRange.end)
 
       ranges = {startRange, endRange} if startRange? and endRange?
     ranges
