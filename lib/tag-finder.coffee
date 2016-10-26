@@ -7,13 +7,13 @@ SelectorCache = require './selector-cache'
 module.exports =
 class TagFinder
   constructor: (@editor) ->
-    @tagPattern = /(\{\{(\/?))([^\s\}\}]+)([\s\}\}]|$)/
-    @wordRegex = /[-\w]*/
-    @tagSelector = SelectorCache.get('meta.tag | punctuation.definition.tag')
+    @tagPattern = /(\{\{)([\?\!/~#]?)(\.*)([-\w\.]*)(@?)/
+    @wordRegex = /[-\w\.]*/
+    @tagSelector = SelectorCache.get('block.vsitemplate')
 
   patternForTagName: (tagName) ->
     tagName = _.escapeRegExp(tagName)
-    new RegExp("(\\{\\{#{tagName}([\\s\\}\\}]|$))|(\\{\\{/#{tagName}\\}\\})", 'gi')
+    new RegExp("(\\{\\{[\\?\\!~\#]#{tagName}(\\}\\}))|(\\{\\{/#{tagName}\\}\\})", 'gi')
 
   isTagRange: (range) ->
     scopes = @editor.scopeDescriptorForBufferPosition(range.start).getScopesArray()
@@ -29,10 +29,11 @@ class TagFinder
     unpairedCount = 0
     @editor.backwardsScanInBufferRange pattern, scanRange, ({match, range, stop}) =>
 
+      console.log match
       if match[1]
         unpairedCount--
         if unpairedCount < 0
-          startRange = range.translate([0, 1], [0, -match[2].length]) # Subtract < and tag name suffix from range
+          startRange = range.translate([0, 3], [0, -match[2].length]) # Subtract < and tag name suffix from range
           stop()
       else
         unpairedCount++
@@ -46,12 +47,13 @@ class TagFinder
     unpairedCount = 0
     @editor.scanInBufferRange pattern, scanRange, ({match, range, stop}) =>
 
+      console.log match
       if match[1]
         unpairedCount++
       else
         unpairedCount--
         if unpairedCount < 0
-          endRange = range.translate([0, 2], [0, -1]) # Subtract </ and > from range
+          endRange = range.translate([0, 3], [0, -2]) # Subtract </ and > from range
           stop()
 
     endRange
@@ -62,14 +64,15 @@ class TagFinder
     @editor.backwardsScanInBufferRange @tagPattern, [[0, 0], endPosition], ({match, range, stop}) =>
       stop()
 
-      [entireMatch, prefix, isClosingTag, tagName, suffix] = match
+      [entireMatch, prefix, operator, parent, tagName, suffix] = match
+      tag = parent + tagName + suffix
 
       if range.start.row is range.end.row
-        startRange = range.translate([0, prefix.length], [0, -suffix.length])
+        startRange = range.translate([0, prefix.length + operator.length], [0, -suffix.length])
       else
-        startRange = Range.fromObject([range.start.translate([0, prefix.length]), [range.start.row, Infinity]])
+        startRange = Range.fromObject([range.start.translate([0, prefix.length + operator.length]), [range.start.row, Infinity]])
 
-      if isClosingTag
+      if operator == '/'
         endRange = @findStartTag(tagName, startRange.start)
       else
         endRange = @findEndTag(tagName, startRange.end)

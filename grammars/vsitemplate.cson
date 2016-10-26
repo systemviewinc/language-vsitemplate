@@ -9,19 +9,19 @@
     'begin': '(\\{\\{)([\\?\\!/~#])(\\.*)([-\\w\\.]*)(@?)'
     'beginCaptures':
       '1':
-        'name': 'variable.parameter.function.vsitemplate'
+        'name': 'variable.parameter.function.block.vsitemplate'
       '2':
-        'name': 'keyword.control.vsitemplate'
+        'name': 'keyword.control.block.vsitemplate'
       '3':
-        'name': 'entity.name.type.instance.vsitemplate'
+        'name': 'entity.name.type.instance.block.vsitemplate'
       '4':
-        'name': 'entity.name.function.vsitemplate'
+        'name': 'entity.name.function.block.vsitemplate'
       '5':
-        'name': 'constant.character.escape.vsitemplate'
+        'name': 'constant.character.escape.block.vsitemplate'
     'end': '(\\}\\})'
     'endCaptures':
       '1':
-        'name': 'variable.parameter.function.vsitemplate'
+        'name': 'variable.parameter.function.block.vsitemplate'
     'name': 'block.vsitemplate'
     'patterns': [
       {
