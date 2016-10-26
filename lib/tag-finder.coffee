@@ -29,7 +29,6 @@ class TagFinder
     unpairedCount = 0
     @editor.backwardsScanInBufferRange pattern, scanRange, ({match, range, stop}) =>
 
-      console.log match
       if match[1]
         unpairedCount--
         if unpairedCount < 0
@@ -47,7 +46,6 @@ class TagFinder
     unpairedCount = 0
     @editor.scanInBufferRange pattern, scanRange, ({match, range, stop}) =>
 
-      console.log match
       if match[1]
         unpairedCount++
       else
