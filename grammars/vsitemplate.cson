@@ -9,7 +9,7 @@
     'begin': '(\\{\\{)([\\?\\!/~#])(\\.*)([-\\w\\.]*)(@?)'
     'beginCaptures':
       '1':
-        'name': 'variable.parameter.function.block.vsitemplate'
+        'name': 'comment.function.block.vsitemplate'
       '2':
         'name': 'keyword.control.block.vsitemplate'
       '3':
@@ -21,7 +21,7 @@
     'end': '(\\}\\})'
     'endCaptures':
       '1':
-        'name': 'variable.parameter.function.block.vsitemplate'
+        'name': 'comment.function.block.vsitemplate'
     'name': 'block.vsitemplate'
     'patterns': [
       {
@@ -33,7 +33,7 @@
     'begin': '(\\{\\{)(\\*?)(\\.*)([-\\w\\.]*)(@?)'
     'beginCaptures':
       '1':
-        'name': 'variable.parameter.function.vsitemplate'
+        'name': 'comment.parameter.vsitemplate'
       '2':
         'name': 'keyword.operator.vsitemplate'
       '3':
@@ -45,7 +45,7 @@
     'end': '(\\}\\})'
     'endCaptures':
       '1':
-        'name': 'variable.parameter.function.vsitemplate'
+        'name': 'comment.parameter.vsitemplate'
     'name': 'meta.tag.vsitemplate'
     'patterns': [
       {
