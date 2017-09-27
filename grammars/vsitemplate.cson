@@ -6,7 +6,7 @@
 ]
 'patterns': [
   {
-    'begin': '(\\{\\{)([\\?\\!/~#])(\\.*)([-\\w\\.]*)(@?)'
+    'begin': '(\\{\\{)([\\?\\!/~#]|for|end|if|else|else if|not|contains|set)([^}]*)(@?)'
     'beginCaptures':
       '1':
         'name': 'comment.function.block.vsitemplate'
@@ -16,8 +16,6 @@
         'name': 'entity.name.type.instance.block.vsitemplate'
       '4':
         'name': 'entity.name.function.block.vsitemplate'
-      '5':
-        'name': 'constant.character.escape.block.vsitemplate'
     'end': '(\\}\\})'
     'endCaptures':
       '1':
@@ -30,7 +28,7 @@
     ]
   }
   {
-    'begin': '(\\{\\{)(\\*?)(\\.*)([-\\w\\.]*)(@?)'
+    'begin': '(\\{\\{)(\\*?)(\\.*)([^}]*)(@?)'
     'beginCaptures':
       '1':
         'name': 'comment.parameter.vsitemplate'

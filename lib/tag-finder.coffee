@@ -7,13 +7,17 @@ SelectorCache = require './selector-cache'
 module.exports =
 class TagFinder
   constructor: (@editor) ->
-    @tagPattern = /(\{\{)([\?\!/~#]?)(\.*)([-\w\.]*)(@?)/
+    @tagPattern = /(\{\{)([\?\!/~#]|for|end|if|else|else if|not|contains)\s*([^}]*)(@?)/
     @wordRegex = /[^\}\r\n]*/
     @tagSelector = SelectorCache.get('block.vsitemplate')
 
-  patternForTagName: (tagName) ->
+  patternForTagName: (operator, tagName) ->
     tagName = _.escapeRegExp(tagName)
-    new RegExp("(\\{\\{[\\?\\!~\#]#{tagName}(\\}\\}))|(\\{\\{/#{tagName}\\}\\})", 'gi')
+    if operator.match(/[#!~?/]/)
+      pattern = new RegExp("(\\{\\{[?!~#]\\s*#{tagName}\\s*\\}\\})|(\\{\\{\\s*/\\s*#{tagName}\\s*\\}\\})", 'gi')
+    else
+      pattern = /(\{\{(?:for|if|else|else if|not|contains)\s*[^}]*\}\})|(\{\{\s*end\s*\}\})/gi
+    pattern
 
   isTagRange: (range) ->
     scopes = @editor.scopeDescriptorForBufferPosition(range.start).getScopesArray()
@@ -22,30 +26,28 @@ class TagFinder
   isCursorOnTag: ->
     @tagSelector.matches(@editor.getLastCursor().getScopeDescriptor().getScopesArray())
 
-  findStartTag: (tagName, endPosition) ->
+  findStartTag: (operator, tagName, endPosition) ->
     scanRange = new Range([0, 0], endPosition)
-    pattern = @patternForTagName(tagName)
+    pattern = @patternForTagName(operator, tagName)
     startRange = null
     unpairedCount = 0
     @editor.backwardsScanInBufferRange pattern, scanRange, ({match, range, stop}) =>
-
       if match[1]
         unpairedCount--
         if unpairedCount < 0
-          startRange = range.translate([0, 3], [0, -match[2].length]) # Subtract {{ and block operator from range
+          startRange = range.translate([0, 3], [0, -2]) # Subtract {{ and block operator from range
           stop()
       else
         unpairedCount++
 
     startRange
 
-  findEndTag: (tagName, startPosition) ->
+  findEndTag: (operator, tagName, startPosition) ->
     scanRange = new Range(startPosition, @editor.buffer.getEndPosition())
-    pattern = @patternForTagName(tagName)
+    pattern = @patternForTagName(operator, tagName)
     endRange = null
     unpairedCount = 0
     @editor.scanInBufferRange pattern, scanRange, ({match, range, stop}) =>
-
       if match[1]
         unpairedCount++
       else
@@ -62,18 +64,18 @@ class TagFinder
     @editor.backwardsScanInBufferRange @tagPattern, [[0, 0], endPosition], ({match, range, stop}) =>
       stop()
 
-      [entireMatch, prefix, operator, parent, tagName, suffix] = match
-      tag = parent + tagName + suffix
+      [entireMatch, prefix, operator, tagName, suffix] = match
+      tag = tagName + suffix
 
       if range.start.row is range.end.row
         startRange = range.translate([0, prefix.length + operator.length], [0, -suffix.length])
       else
         startRange = Range.fromObject([range.start.translate([0, prefix.length + operator.length]), [range.start.row, Infinity]])
 
-      if operator == '/'
-        endRange = @findStartTag(tag, startRange.start)
+      if operator == '/' || operator == 'end'
+        endRange = @findStartTag(operator, tag, startRange.start)
       else
-        endRange = @findEndTag(tag, startRange.end)
+        endRange = @findEndTag(operator, tag, startRange.end)
 
       ranges = {startRange, endRange} if startRange? and endRange?
     ranges
