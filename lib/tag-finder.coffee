@@ -14,9 +14,9 @@ class TagFinder
   patternForTagName: (operator, tagName) ->
     tagName = _.escapeRegExp(tagName)
     if operator.match(/[#!~?/]/)
-      pattern = new RegExp("(\\{\\{[?!~#]\\s*#{tagName}\\s*\\}\\})|(\\{\\{\\s*/\\s*#{tagName}\\s*\\}\\})", 'gi')
+      pattern = new RegExp("\\{\\{s*([?!~#]\\s*#{tagName})|(\\/\\s*#{tagName})\\s*\\}\\}", 'gi')
     else
-      pattern = /(\{\{(?:for|if|else|else if|not|contains)\s*[^}]*\}\})|(\{\{\s*end\s*\}\})/gi
+      pattern = /\{\{(?:((?:for|if|not|contains)\s*[^}]*)|(end)|((?:else|else if)\s*[^}]*))\s*\}\}/gi
     pattern
 
   isTagRange: (range) ->
@@ -26,39 +26,45 @@ class TagFinder
   isCursorOnTag: ->
     @tagSelector.matches(@editor.getLastCursor().getScopeDescriptor().getScopesArray())
 
-  findStartTag: (operator, tagName, endPosition) ->
+  findStartTags: (operator, tagName, endPosition) ->
     scanRange = new Range([0, 0], endPosition)
     pattern = @patternForTagName(operator, tagName)
     startRange = null
     unpairedCount = 0
+    midRanges = []
     @editor.backwardsScanInBufferRange pattern, scanRange, ({match, range, stop}) =>
-      if match[1]
+      if match[3]
+        midRanges.push(range.translate([0, 2], [0, -2])) if unpairedCount == 0
+      else if match[1]
         unpairedCount--
         if unpairedCount < 0
-          startRange = range.translate([0, 3], [0, -2]) # Subtract {{ and block operator from range
+          startRange = range.translate([0, 2], [0, -2]) # Subtract {{ and block operator from range
           stop()
       else
         unpairedCount++
 
-    startRange
+    {range: startRange, midRanges}
 
-  findEndTag: (operator, tagName, startPosition) ->
+  findEndTags: (operator, tagName, startPosition) ->
     scanRange = new Range(startPosition, @editor.buffer.getEndPosition())
     pattern = @patternForTagName(operator, tagName)
     endRange = null
     unpairedCount = 0
+    midRanges = []
     @editor.scanInBufferRange pattern, scanRange, ({match, range, stop}) =>
-      if match[1]
+      if match[3]
+        midRanges.push(range.translate([0, 2], [0, -2])) if unpairedCount == 0
+      else if match[1]
         unpairedCount++
       else
         unpairedCount--
         if unpairedCount < 0
-          endRange = range.translate([0, 3], [0, -2]) # Subtract {{/ and }} from range
+          endRange = range.translate([0, 2], [0, -2]) # Subtract {{/ and }} from range
           stop()
 
-    endRange
+    {range: endRange, midRanges}
 
-  findStartEndTags: ->
+  findTags: ->
     ranges = null
     endPosition = @editor.getLastCursor().getCurrentWordBufferRange({@wordRegex}).end
     @editor.backwardsScanInBufferRange @tagPattern, [[0, 0], endPosition], ({match, range, stop}) =>
@@ -68,16 +74,28 @@ class TagFinder
       tag = tagName + suffix
 
       if range.start.row is range.end.row
-        startRange = range.translate([0, prefix.length + operator.length], [0, -suffix.length])
+        cursorRange = range.translate([0, prefix.length], [0, -suffix.length])
       else
-        startRange = Range.fromObject([range.start.translate([0, prefix.length + operator.length]), [range.start.row, Infinity]])
+        cursorRange = Range.fromObject([range.start.translate([0, prefix.length + operator.length]), [range.start.row, Infinity]])
+
+      startTags = {range: cursorRange, midRanges: []}
 
       if operator == '/' || operator == 'end'
-        endRange = @findStartTag(operator, tag, startRange.start)
+        endTags = @findStartTags(operator, tag, cursorRange.start)
+      else if operator == 'else' || operator == 'else if'
+        startTags = @findStartTags(operator, tag, cursorRange.start)
+        endTags = @findEndTags(operator, tag, cursorRange.end)
       else
-        endRange = @findEndTag(operator, tag, startRange.end)
+        endTags = @findEndTags(operator, tag, cursorRange.end)
 
-      ranges = {startRange, endRange} if startRange? and endRange?
+      if endTags.range
+        ranges = {
+          startRange: startTags.range,
+          endRange: endTags.range,
+          midRanges: startTags.midRanges.concat endTags.midRanges
+        }
+      ranges.midRanges.push cursorRange if operator == 'else' || operator == 'else if'
+
     ranges
 
   findEnclosingTags: ->
@@ -88,4 +106,4 @@ class TagFinder
     null
 
   findMatchingTags: ->
-    @findStartEndTags() if @isCursorOnTag()
+    @findTags() if @isCursorOnTag()

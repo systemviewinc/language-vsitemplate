@@ -40,6 +40,9 @@ class BracketMatcherView
     if @pairHighlighted
       @editor.destroyMarker(@startMarker.id)
       @editor.destroyMarker(@endMarker.id)
+      if @midMarkers and @midMarkers.length
+        for midMarker in @midMarkers
+          @editor.destroyMarker(midMarker.id)
 
     @pairHighlighted = false
     @tagHighlighted = false
@@ -48,8 +51,13 @@ class BracketMatcherView
     return if @editor.isFoldedAtCursorRow()
 
     if pair = @tagFinder.findMatchingTags()
+      console.log pair
       @startMarker = @createMarker(pair.startRange)
       @endMarker = @createMarker(pair.endRange)
+      @midMarkers = []
+      for midRange in pair.midRanges
+          @midMarkers.push(@createMarker(midRange))
+
       @pairHighlighted = true
       @tagHighlighted = true
 
